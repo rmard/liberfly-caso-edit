@@ -1,3 +1,7 @@
 .progressBarSpace {
   height: 27px;
 }
+
+.materialize-textarea {
+  height: 120px!important;
+}

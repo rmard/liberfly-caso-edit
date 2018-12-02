@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
+import queryString from 'query-string';
 import { Button, ProgressBar, Input, Card, Row, Col, Icon } from 'react-materialize';
 
 const debounce = (fn, delay) => {
@@ -27,6 +28,7 @@ const formatNumber = (n) => {
 
 class App extends Component {
   state = {
+    id: 0,
     loading: false,
     obs_visivel: '',
     origem: '',
@@ -34,7 +36,7 @@ class App extends Component {
     pais: '',
     autoridade_comp: '',
     reg_reclamacao: '',
-    companhia_aerea: 'Gol',
+    companhia_aerea: '',
     intermediadora: '',
     assunto: [],
     prev_envio_docs: '',
@@ -45,9 +47,22 @@ class App extends Component {
     resumo: '',
     created: '',
   }
-  serverUpdate = (obj) => {
+  serverUpdate = (key, val) => {
     this.setState({loading: true});
-    setTimeout(()=>{this.setState({loading: false})}, 500);
+    let formdata = new FormData();
+    formdata.append(key, val);
+    fetch('https://sistema.liberfly.com.br/casos/reactedit/'+this.state.id+'.json', {
+      method: "POST",
+      body: formdata
+    })
+    .then((res)=>{
+      this.setState({loading: false});
+      if(res.status!==200)
+        alert('Ocorreu um erro ao tentar salvar o campo '+key);
+    })
+    .catch((res)=>{
+      this.setState({loading: false});
+    })    
   }
   handleChange = (e) => {
     let val;
@@ -61,17 +76,22 @@ class App extends Component {
     var obj = {};
     obj[e.target.name] = val;
     this.setState(obj);
-    this.serverUpdate(obj);
+    this.serverUpdate(e.target.name, val);
   }
   constructor(props) {
     super(props);
     this.serverUpdate = debounce(this.serverUpdate, 600);
   }  
   componentDidMount() {
-    // window.document.getElementsByClassName('datepicker')[0].pickadate({
-    //   selectMonths: true, // Creates a dropdown to control month
-    //   selectYears: 15 // Creates a dropdown of 15 years to control year
-    // });
+    const query = queryString.parse(window.location.search);
+    this.setState({loading: true, id: query.caso});
+    fetch('https://sistema.liberfly.com.br/casos/reactedit/'+query.caso+'.json')
+      .then(res=>res.json())
+      .then(data=>{
+        this.setState(data.caso);
+        this.setState({loading: false});
+        [...document.getElementsByTagName('label')].forEach(function(e){e.className='active'});
+      });
   }
   render() {
     const { 
