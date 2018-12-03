@@ -284,12 +284,15 @@ class App extends Component {
               Campos marcados com * são de preenchimento obrigatório antes do repasse para o jurídico.<br/>
               Campos marcados com ** são de preenchimento obrigatório antes de entrar na esteira "ajuizada"
             </p>
+            {
+              /*
             <p className='grey-text right-align'>
               Caso cadastrado por <strong>....</strong> em <strong>{created}</strong>
             </p>
             <p className='red-text right-align'>
               Excluir caso
             </p>
+          */}
           </Col>                                   
         </Row>
       </div>
