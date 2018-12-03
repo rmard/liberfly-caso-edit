@@ -76,7 +76,7 @@ class App extends Component {
       })
     }
     else if(key==='prev_envio_docs')
-      val = e.target.value;
+      val = ((new Date(e.target.value).toISOString())+' ').substr(0,10);
     else if(key==='valor_esperado')
       val = formatNumber(e.target.value);    
     else
@@ -98,6 +98,7 @@ class App extends Component {
       .then(data=>{
         this.setState(data.caso);
         this.setState({assunto: data.caso.assunto.split(',')});
+        this.setState({prev_envio_docs: (data.caso.prev_envio_docs).substr(0,10)});
         this.setState({loading: false});
         [...document.getElementsByTagName('label')].forEach(function(e){e.className='active'});
         window.materialselect();
