@@ -46,6 +46,11 @@
         $("input[name=companhia_aerea]").val(selecao);
         //$("label[for=companhia_aerea]").addClass("active");
         $("input[name=companhia_aerea]").blur();
+        $("input[name=companhia_aerea]").change();
+      }
+
+      window.materialselect = () => {
+        $('select').material_select();
       }
     </script>
   </body>

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
 import queryString from 'query-string';
-import { Button, ProgressBar, Input, Card, Row, Col, Icon } from 'react-materialize';
+import { ProgressBar, Input, Row, Col } from 'react-materialize';
 
 const debounce = (fn, delay) => {
   let timer = null;
@@ -66,17 +66,25 @@ class App extends Component {
   }
   handleChange = (e) => {
     let val;
+    let key = e.target.name;
     //----TODO: Format----//  e assunto
-    if(e.target.name==='prev_envio_docs')
+    if(key==='assunto') {
+      val = [];
+      [...e.target.options].forEach((opt)=>{
+        if(opt.selected && opt.value!=='')
+          val.push(opt.value);
+      })
+    }
+    else if(key==='prev_envio_docs')
       val = e.target.value;
-    if(e.target.name==='valor_esperado')
+    else if(key==='valor_esperado')
       val = formatNumber(e.target.value);    
     else
       val = e.target.value;
     var obj = {};
-    obj[e.target.name] = val;
+    obj[key] = val;
     this.setState(obj);
-    this.serverUpdate(e.target.name, val);
+    this.serverUpdate(key, val);
   }
   constructor(props) {
     super(props);
@@ -89,8 +97,10 @@ class App extends Component {
       .then(res=>res.json())
       .then(data=>{
         this.setState(data.caso);
+        this.setState({assunto: data.caso.assunto.split(',')});
         this.setState({loading: false});
         [...document.getElementsByTagName('label')].forEach(function(e){e.className='active'});
+        window.materialselect();
       });
   }
   render() {
