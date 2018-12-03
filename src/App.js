@@ -99,7 +99,8 @@ class App extends Component {
       .then(data=>{
         this.setState(data.caso);
         this.setState({assunto: data.caso.assunto.split(',')});
-        this.setState({prev_envio_docs: (data.caso.prev_envio_docs).substr(0,10)});
+        if(data.caso.prev_envio_docs!==null)
+          this.setState({prev_envio_docs: (data.caso.prev_envio_docs).substr(0,10)});
         this.setState({loading: false});
         [...document.getElementsByTagName('label')].forEach(function(e){e.className='active'});
         window.materialselect();
