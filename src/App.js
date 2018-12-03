@@ -93,6 +93,7 @@ class App extends Component {
   componentDidMount() {
     const query = queryString.parse(window.location.search);
     this.setState({loading: true, id: query.caso});
+    window.casoid = query.caso;
     fetch('https://sistema.liberfly.com.br/casos/reactedit/'+query.caso+'.json')
       .then(res=>res.json())
       .then(data=>{
