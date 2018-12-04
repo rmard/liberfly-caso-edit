@@ -5,3 +5,9 @@
 .materialize-textarea {
   height: 120px!important;
 }
+
+.chip button {
+	border: none;
+    background-color: transparent;
+    color: black;
+}

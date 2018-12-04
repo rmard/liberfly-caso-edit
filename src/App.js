@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import './App.css';
 import queryString from 'query-string';
-import { ProgressBar, Input, Row, Col } from 'react-materialize';
+import { Modal, ProgressBar, Input, Row, Col } from 'react-materialize';
+import AirlinesSelector from './AirlinesSelector'
 
 const debounce = (fn, delay) => {
   let timer = null;
@@ -128,6 +129,11 @@ class App extends Component {
     } = this.state;
     return (
       <div>
+        <Modal
+          id='airlines-selector'
+          header='Modal Header'>
+          Lorem ipsum dolor sit amet
+        </Modal>      
         <Row>
           {loading ? (
             <Col s={12}>
@@ -188,19 +194,30 @@ class App extends Component {
             value={reg_reclamacao}
             name="reg_reclamacao"
             onChange={this.handleChange}
-          />       
-          <Input 
-            m={3}
-            label="Cia(s) Aérea **"
-            value={companhia_aerea}
-            name="companhia_aerea"
-            onChange={this.handleChange}
-            onClick={(e)=>{
-              e.preventDefault();
-              e.target.blur();
-              window.open("https://sistema.liberfly.com.br/casos/seleciona_cias?cias="+companhia_aerea, 'seleciona_cias','menubar=1,resizable=1,width=600,height=320');
-            }}
-          /> 
+          />     
+          <Modal
+            header='Companhias aéreas'
+            trigger={
+              <Input 
+                m={3}
+                label="Cia(s) Aérea **"
+                value={companhia_aerea}
+                name="companhia_aerea"
+                readOnly={true}
+                onChange={this.handleChange}
+                onClick={(e)=>{
+                  //document.getElementById('airlines-selector').modal('open')
+                  e.preventDefault();
+                  e.target.blur();
+                  // window.open("https://sistema.liberfly.com.br/casos/seleciona_cias?cias="+companhia_aerea, 'seleciona_cias','menubar=1,resizable=1,width=600,height=320');
+                }}
+              />               
+            }>
+            <AirlinesSelector
+              value={companhia_aerea}
+              handleChange={this.handleChange}
+            />
+          </Modal>            
           <Input 
             m={3}
             label="Intermediadora"
