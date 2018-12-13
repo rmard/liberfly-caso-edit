@@ -217,14 +217,28 @@ class App extends Component {
               value={companhia_aerea}
               handleChange={this.handleChange}
             />
-          </Modal>            
-          <Input 
+          </Modal>    
+          <Input
+            type='select'
             m={3}
-            label="Intermediadora"
+            label='Intermediadora'
             value={intermediadora}
-            name="intermediadora"
+            name='intermediadora'
             onChange={this.handleChange}
-          />       
+          >
+            <option></option>
+            <option>Decolar</option>
+            <option>ViajaNet</option>
+            <option>MaxMilhas</option>
+            <option>Booking</option>
+            <option>MultiPlus</option>
+            <option>Visa</option>
+            <option>Submarino</option>
+            <option>CVC</option>
+            <option>Zupper</option>
+            <option>{intermediadora}</option>
+            <option disabled>Se não constar na lista, solicite a inclusão</option>
+          </Input>                         
           <Input
             type='select'
             m={6}
