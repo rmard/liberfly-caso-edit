@@ -283,6 +283,7 @@ class App extends Component {
             m={2}
             label="Origem"
             placeholder="AEROPORTO"
+            maxLength={3}
             value={aeroporto_origem}
             name="aeroporto_origem"
             onChange={this.handleChange}
@@ -291,6 +292,7 @@ class App extends Component {
             m={2}
             label="Destino"
             placeholder="AEROPORTO"
+            maxLength={3}
             value={aeroporto_destino}
             name="aeroporto_destino"
             onChange={this.handleChange}
