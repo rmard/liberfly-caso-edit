@@ -227,7 +227,9 @@ class App extends Component {
             onChange={this.handleChange}
           >
             <option></option>
+            <option>123Milhas</option>
             <option>Decolar</option>
+            <option>eDreams</option>
             <option>ViajaNet</option>
             <option>MaxMilhas</option>
             <option>Booking</option>
