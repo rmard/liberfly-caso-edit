@@ -228,15 +228,16 @@ class App extends Component {
           >
             <option></option>
             <option>123Milhas</option>
+            <option>Booking</option>
+            <option>CVC</option>
             <option>Decolar</option>
             <option>eDreams</option>
-            <option>ViajaNet</option>
             <option>MaxMilhas</option>
-            <option>Booking</option>
             <option>MultiPlus</option>
-            <option>Visa</option>
             <option>Submarino</option>
-            <option>CVC</option>
+            <option>TourHouse</option>
+            <option>ViajaNet</option>
+            <option>Visa</option>            
             <option>Zupper</option>
             <option>{intermediadora}</option>
             <option disabled>Se não constar na lista, solicite a inclusão</option>
@@ -283,7 +284,7 @@ class App extends Component {
           />    
           <Input 
             m={2}
-            label="Origem"
+            label="Origem*"
             placeholder="AEROPORTO"
             maxLength={3}
             value={aeroporto_origem}
@@ -292,7 +293,7 @@ class App extends Component {
           />
           <Input 
             m={2}
-            label="Destino"
+            label="Destino*"
             placeholder="AEROPORTO"
             maxLength={3}
             value={aeroporto_destino}
