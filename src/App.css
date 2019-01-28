@@ -15,3 +15,7 @@
 input, textarea {
 	color: white;
 }
+
+input.autocomplete {
+    color: #424242!important;
+}

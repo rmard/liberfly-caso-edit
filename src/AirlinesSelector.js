@@ -1,6 +1,6 @@
 import React from 'react'
 import airlinesList from './airlinesList'
-import { Autocomplete, Chip, Row, Col } from 'react-materialize';
+import { Autocomplete, Chip, Row } from 'react-materialize';
 //import { Input } from 'react-materialize';
 
 class AirlinesSelector extends React.Component {
@@ -13,7 +13,7 @@ class AirlinesSelector extends React.Component {
 		let newVal = list.join(',');
 		let obj = {
 			target: {
-				name: 'companhia_aerea',
+				name: this.props.fieldName, //companhia_aerea or lista_empresas
 				value: newVal
 			},
 		};
@@ -21,6 +21,12 @@ class AirlinesSelector extends React.Component {
 	}
 	render = () => {
 		const list = this.props.value!==''?this.props.value.split(','):[];
+		var opt = {};
+		if(this.props.options)
+			this.props.options.map((o)=>{opt[o] = null;})
+		else
+			opt = airlinesList
+		//console.log(opt);
 		return (
 			<div>
 				{list.map((v)=>(
@@ -35,7 +41,7 @@ class AirlinesSelector extends React.Component {
 				  	<Autocomplete
 					    title='Nova cia'
 					    data={
-					      airlinesList
+					    	opt
 					    }
 					   	onAutocomplete={val=>{this.airlinesChange('add', val)}}
 				  	/>

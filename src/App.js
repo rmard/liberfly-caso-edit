@@ -3,6 +3,7 @@ import './App.css';
 import queryString from 'query-string';
 import { Modal, ProgressBar, Input, Row, Col } from 'react-materialize';
 import AirlinesSelector from './AirlinesSelector'
+import Helpers from './Helpers'
 
 const debounce = (fn, delay) => {
   let timer = null;
@@ -38,6 +39,8 @@ class App extends Component {
     autoridade_comp: '',
     reg_reclamacao: '',
     companhia_aerea: '',
+    lista_empresas: '',
+    lista_empresas_server: '',
     intermediadora: '',
     assunto: [],
     prev_envio_docs: '',
@@ -45,6 +48,8 @@ class App extends Component {
     aeroporto_origem: '',
     aeroporto_destino: '',
     valor_esperado: 0,
+    isCd: false,
+    valor_cd: 0,
     resumo: '',
     created: '',
   }
@@ -66,23 +71,29 @@ class App extends Component {
     })    
   }
   handleChange = (e) => {
+    var obj = {};
     let val;
     let key = e.target.name;
-    //----TODO: Format----//  e assunto
     if(key==='assunto') {
       val = [];
       [...e.target.options].forEach((opt)=>{
         if(opt.selected && opt.value!=='')
           val.push(opt.value);
       })
+      obj['valor_esperado'] = (Helpers.calculaValorEsperado(val));
+      this.serverUpdate('valor_esperado', Helpers.calculaValorEsperado(val));
+      this.calculaValorCd(obj['valor_esperado']);
     }
     else if(key==='prev_envio_docs')
       val = ((new Date(e.target.value).toISOString())+' ').substr(0,10);
-    else if(key==='valor_esperado')
-      val = formatNumber(e.target.value);    
+    else if(key==='valor_esperado') {
+      val = formatNumber(e.target.value);   
+      this.calculaValorCd(val);
+    }
+    else if(key==='valor_cd')
+      val = formatNumber(e.target.value);          
     else
       val = e.target.value;
-    var obj = {};
     obj[key] = val;
     this.setState(obj);
     this.serverUpdate(key, val);
@@ -95,6 +106,12 @@ class App extends Component {
     const query = queryString.parse(window.location.search);
     this.setState({loading: true, id: query.caso});
     window.casoid = query.caso;
+    fetch('https://sistema.liberfly.com.br/empresas/lista.json')
+      .then(res=>res.json())
+      .then(data=>{
+        this.setState({lista_empresas_server: data.lista_empresas});
+      })
+
     fetch('https://sistema.liberfly.com.br/casos/reactedit/'+query.caso+'.json')
       .then(res=>res.json())
       .then(data=>{
@@ -102,11 +119,23 @@ class App extends Component {
         this.setState({assunto: data.caso.assunto.split(',')});
         if(data.caso.prev_envio_docs!==null)
           this.setState({prev_envio_docs: (data.caso.prev_envio_docs).substr(0,10)});
+        if(data.caso.valor_cd!==0)
+          this.setState({isCd: true});
         this.setState({loading: false});
         [...document.getElementsByTagName('label')].forEach(function(e){e.className='active'});
         window.materialselect();
       });
   }
+  calculaValorCd = (ve) => {
+    if(this.state.isCd) {
+      if(ve!==undefined) {
+        this.setState((prev)=>({valor_cd: (ve)/4}));
+        this.serverUpdate('valor_cd', (ve)/4);
+      }
+      else
+        this.setState((prev)=>({valor_cd: (prev.valor_esperado)/4}));
+    }
+  }  
   render() {
     const { 
       loading, 
@@ -117,6 +146,8 @@ class App extends Component {
       autoridade_comp,
       reg_reclamacao,
       companhia_aerea,
+      lista_empresas,
+      lista_empresas_server,
       intermediadora,
       assunto,
       prev_envio_docs,
@@ -124,8 +155,10 @@ class App extends Component {
       aeroporto_origem,
       aeroporto_destino,
       valor_esperado,
+      valor_cd,
       resumo,
       created,
+      isCd,
     } = this.state;
     return (
       <div>
@@ -200,6 +233,7 @@ class App extends Component {
             trigger={
               <Input 
                 m={3}
+                disabled={true}
                 label="Cia(s) Aérea **"
                 value={companhia_aerea}
                 name="companhia_aerea"
@@ -214,11 +248,14 @@ class App extends Component {
               />               
             }>
             <AirlinesSelector
+              fieldName='companhia_aerea'
+              options={false}
               value={companhia_aerea}
               handleChange={this.handleChange}
             />
           </Modal>    
           <Input
+            disabled={true}
             type='select'
             m={3}
             label='Intermediadora'
@@ -241,7 +278,32 @@ class App extends Component {
             <option>Zupper</option>
             <option>{intermediadora}</option>
             <option disabled>Se não constar na lista, solicite a inclusão</option>
-          </Input>                         
+          </Input>  
+          <Modal
+            header='Empresas (novo)'
+            trigger={
+              <Input 
+                m={6}
+                label="Empresas (novo)"
+                value={lista_empresas}
+                name="lista_empresas"
+                readOnly={true}
+                onChange={this.handleChange}
+                onClick={(e)=>{
+                  //document.getElementById('airlines-selector').modal('open')
+                  e.preventDefault();
+                  e.target.blur();
+                  // window.open("https://sistema.liberfly.com.br/casos/seleciona_cias?cias="+companhia_aerea, 'seleciona_cias','menubar=1,resizable=1,width=600,height=320');
+                }}
+              />               
+            }>
+            <AirlinesSelector
+              fieldName='lista_empresas'
+              options={lista_empresas_server}
+              value={lista_empresas}
+              handleChange={this.handleChange}
+            />
+          </Modal>                                 
           <Input
             type='select'
             m={6}
@@ -252,9 +314,8 @@ class App extends Component {
             onChange={this.handleChange}
           >
             <option value="" disabled>Selecione</option>
-            <option value="atrasoate5">Atraso de voo até 5 horas</option>
-            <option value="atrasoate10">Atraso de voo até 10 horas</option>
-            <option value="atrasomais10">Atraso de voo superior 10 horas</option>
+            <option value="atrasoate4">Atraso de voo até 4 horas</option>
+            <option value="atrasomaior4">Atraso de voo maior que 4 horas</option>
             <option value="cancelamentoclima">Cancelamento de voo por motivos climáticos</option>
             <option value="cancelamentooperacionais">Cancelamento de voo por problemas operacionais</option>
             <option value="cancelamentotripulacao">Cancelamento de voo por falta de tripulação</option>
@@ -262,19 +323,20 @@ class App extends Component {
             <option value="overbooking">Overbooking</option>
             <option value="reembolso">Reembolso</option>
             <option value="milhas">Milhas</option>
-            <option value="extraviobagagemate5dias">Extravio de bagagem até 5 dias</option>
-            <option value="extraviobagagemate15dias">Extravio de bagagem até 15 dias</option>
-            <option value="extraviobagagemsuperior15dias">Extravio de bagagem superior a 15 dias</option>
+            <option value="extraviobagagemtemporario">Extravio de bagagem temporário</option>
             <option value="extraviobagagemdefinitivo">Extravio de bagagem definitivo</option>
+            <option value="noshow">No-show</option>
             <option value="danobagagem">Dano em bagagem</option>
-            <option value="outros">Outros</option>
+            <option value="falhaprestacao">Falha na prestação do serviço</option>
+            <option disabled value="outros">Outros</option>
           </Input>    
           <Input 
             value={prev_envio_docs}
             label='Prev. Envio Docs'
             name='prev_envio_docs' 
             type='date' 
-            onChange={(e, value)=>{this.handleChange(e);}} />     
+            onChange={(e, value)=>{this.handleChange(e);}} 
+          />     
           <Input 
             m={4}
             label="Motivo"
@@ -300,6 +362,26 @@ class App extends Component {
             name="aeroporto_destino"
             onChange={this.handleChange}
           />  
+          {isCd ? 
+            <Input 
+              m={2}
+              step='0.01'
+              label="Valor compra direito"
+              value={readableNumber(valor_cd)}
+              name="valor_cd"
+              onChange={this.handleChange}
+            />   
+          :
+            <Input 
+              m={2}
+              name='group1' 
+              type='checkbox' 
+              value='green' 
+              label='Compra direito' 
+              className='filled-in' 
+              onChange={()=>{this.setState({isCd:true}); this.calculaValorCd();}} 
+            />           
+          }          
           <Input 
             m={2}
             step='0.01'
