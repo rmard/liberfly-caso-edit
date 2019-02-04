@@ -127,14 +127,18 @@ class App extends Component {
       });
   }
   calculaValorCd = (ve) => {
-    if(this.state.isCd) {
-      if(ve!==undefined) {
-        this.setState((prev)=>({valor_cd: (ve)/4}));
-        this.serverUpdate('valor_cd', (ve)/4);
+    setTimeout(()=>{
+      if(this.state.isCd) {
+        if(ve!==undefined) {
+          this.setState((prev)=>({valor_cd: (ve)/4}));
+        }
+        else
+          this.setState((prev)=>({valor_cd: (prev.valor_esperado)/4}));
+        setTimeout(()=>{
+          this.serverUpdate('valor_cd', this.state.valor_cd);
+        }, 500);        
       }
-      else
-        this.setState((prev)=>({valor_cd: (prev.valor_esperado)/4}));
-    }
+    }, 1000);
   }  
   render() {
     const { 
@@ -379,7 +383,7 @@ class App extends Component {
               value='green' 
               label='Compra direito' 
               className='filled-in' 
-              onChange={()=>{this.setState({isCd:true}); this.calculaValorCd();}} 
+              onChange={()=>{this.setState({isCd:true}); this.calculaValorCd()}} 
             />           
           }          
           <Input 
